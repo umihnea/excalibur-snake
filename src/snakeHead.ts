@@ -6,10 +6,10 @@ import { GameState } from "./gameState";
 import { Directions } from "./directions";
 
 const DIFFS = Object.freeze({
-    [Directions.UP]: { rows: -1, cols: 0 },
-    [Directions.DOWN]: { rows: 1, cols: 0 },
-    [Directions.LEFT]: { rows: 0, cols: 1 },
-    [Directions.RIGHT]: { rows: 0, cols: -1 },
+    [Directions.UP]: { rows: 0, cols: -1 },
+    [Directions.DOWN]: { rows: 0, cols: 1 },
+    [Directions.LEFT]: { rows: -1, cols: 0 },
+    [Directions.RIGHT]: { rows: 1, cols: 0 },
 }) as Readonly<Record<string, { rows: number; cols: number; }>>;
 
 class SnakeHead extends ex.Actor {
@@ -31,7 +31,18 @@ class SnakeHead extends ex.Actor {
             height: this.height,
             color: ex.Color.Yellow,
         });
+
         this.graphics.add(rectangle);
+    }
+
+    private advanceGridPosition(
+        current: number, delta: number, end: number
+    ): number {
+        if (current < 0) {
+            return end - 1;
+        }
+
+        return (current + delta) % end;
     }
 
     public onPostUpdate(engine: ex.Engine, _delta: number) {
@@ -40,8 +51,12 @@ class SnakeHead extends ex.Actor {
         if (direction && DIFFS[direction]) {
             const { row, col } = vecToGrid(this.pos);
             const nextPos = gridToVec({
-                row: (row + DIFFS[direction].rows) % GridProperties.NUMBER_ROWS,
-                col: (col + DIFFS[direction].cols) % GridProperties.NUMBER_COLUMNS
+                row: this.advanceGridPosition(
+                    row, DIFFS[direction].rows, GridProperties.NUMBER_ROWS
+                ),
+                col: this.advanceGridPosition(
+                    col, DIFFS[direction].cols, GridProperties.NUMBER_COLUMNS
+                ),
             });
 
             this.pos.setTo(nextPos.x, nextPos.y);

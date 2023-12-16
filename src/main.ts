@@ -13,6 +13,7 @@ class Game extends Engine {
     super({
       width: GridProperties.NUMBER_COLUMNS * GridProperties.TILE_SIZE,
       height: GridProperties.NUMBER_ROWS * GridProperties.TILE_SIZE,
+      maxFps: 5,
     });
 
     this.gameState = this.initializeState();
@@ -34,6 +35,8 @@ class Game extends Engine {
 
     const loader = new Loader([Resources.Sword]);
     this.start(loader);
+
+    this.showDebug(true);
   }
 
   public onPostUpdate(engine: Engine, _delta: number) {
