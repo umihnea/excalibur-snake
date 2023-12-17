@@ -1,10 +1,12 @@
-import { Engine, Loader, Keys } from "excalibur";
+import { Engine, Loader, Keys, CollisionEndEvent } from "excalibur";
 
 import SnakeHead from "./snakeHead";
+import BonusPoint from "./bonusPoint";
 import { Resources } from "./resources";
 import { GridProperties } from "./constants";
 import { Directions, Direction } from "./directions";
 import { GameState } from "./gameState";
+import { vecToGrid } from "gridToReal";
 
 class Game extends Engine {
   private gameState: GameState;
@@ -22,6 +24,8 @@ class Game extends Engine {
   private initializeState(): GameState {
     return {
       lastPressedDirection: Directions.NONE,
+      score: 0,
+      snakePositions: [],
     };
   }
 
@@ -32,6 +36,37 @@ class Game extends Engine {
       gameState: this.gameState,
     });
     this.add(snakeHead);
+
+    const initialPoint = new BonusPoint({ gameState: this.gameState });
+    this.add(initialPoint);
+
+    snakeHead.on("collisionend", (event: CollisionEndEvent) => {
+      if (event.other instanceof BonusPoint) {
+        this.gameState.score += 1;
+
+        // Add new snake body segment to snake, where the bonus point was.
+        // 1. Copy the point's position.
+        const grid = vecToGrid(event.other.pos);
+        // 2. Remove the point.
+        this.remove(event.other);
+        // 3. Add the segment position to state.
+        this.gameState.snakePositions.push(grid);
+        // 4. TODO: Add the segment entity to game.
+        // const snakeSegment = new SnakeSegment({
+        //   row: grid.row,
+        //   col: grid.col,
+        //   gameState: this.gameState,
+        // });
+        // this.add(snakeSegment);
+
+        // Add a new bonus point
+        const bonusPoint = new BonusPoint({ gameState: this.gameState });
+        this.add(bonusPoint);
+
+        // Remove the touched point
+        this.remove(event.other);
+      }
+    });
 
     const loader = new Loader([Resources.Sword]);
     this.start(loader);

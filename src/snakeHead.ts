@@ -22,6 +22,10 @@ class SnakeHead extends ex.Actor {
             height: GridProperties.TILE_SIZE,
         });
 
+        // From excaliburjs.com/docs: If two Fixed bodies meet they will not be pushed or moved by each other,
+        // they will not interact except to throw collision events.
+        this.body.collisionType = ex.CollisionType.Passive;
+
         this.gameState = props.gameState;
     }
 
