@@ -1,15 +1,18 @@
 import { Engine, Loader, Keys, CollisionEndEvent } from "excalibur";
 
 import SnakeHead from "./snakeHead";
+import SnakeSegment from "./snakeSegment";
 import BonusPoint from "./bonusPoint";
 import { Resources } from "./resources";
 import { GridProperties } from "./constants";
 import { Directions, Direction } from "./directions";
 import { GameState } from "./gameState";
-import { vecToGrid } from "gridToReal";
+import { gridToVec, vecToGrid } from "./gridToReal";
 
 class Game extends Engine {
   private gameState: GameState;
+  private segmentPool: SnakeSegment[];
+  private previousSnakeHeadGrid: null | GridPosition;
 
   constructor() {
     super({
@@ -19,6 +22,8 @@ class Game extends Engine {
     });
 
     this.gameState = this.initializeState();
+    this.segmentPool = [];
+    this.previousSnakeHeadGrid = null;
   }
 
   private initializeState(): GameState {
@@ -26,6 +31,7 @@ class Game extends Engine {
       lastPressedDirection: Directions.NONE,
       score: 0,
       snakePositions: [],
+      lastSnakeHeadGrid: null,
     };
   }
 
@@ -51,13 +57,14 @@ class Game extends Engine {
         this.remove(event.other);
         // 3. Add the segment position to state.
         this.gameState.snakePositions.push(grid);
-        // 4. TODO: Add the segment entity to game.
-        // const snakeSegment = new SnakeSegment({
-        //   row: grid.row,
-        //   col: grid.col,
-        //   gameState: this.gameState,
-        // });
-        // this.add(snakeSegment);
+        // 4. Add the segment entity to game.
+        const snakeSegment = new SnakeSegment({
+          row: grid.row,
+          col: grid.col,
+          gameState: this.gameState,
+        });
+        this.add(snakeSegment);
+        this.segmentPool.push(snakeSegment);
 
         // Add a new bonus point
         const bonusPoint = new BonusPoint({ gameState: this.gameState });
@@ -79,6 +86,22 @@ class Game extends Engine {
     const direction = this.pollDirection(engine);
     if (direction && direction != this.gameState.lastPressedDirection) {
       this.gameState.lastPressedDirection = direction;
+    }
+
+    if (
+      this.segmentPool?.length &&
+      this.gameState.lastSnakeHeadGrid &&
+      this.gameState.lastSnakeHeadGrid !== this.previousSnakeHeadGrid
+    ) {
+      // Push last head position to queue and pop last.
+      this.gameState.snakePositions.unshift(this.gameState.lastSnakeHeadGrid);
+      this.gameState.snakePositions.pop();
+      this.previousSnakeHeadGrid = this.gameState.lastSnakeHeadGrid;
+
+      // Sync the segments to the snakePositions.
+      for (let index = 0; index < this.gameState.snakePositions.length; index ++) {
+        this.segmentPool[index].pos = gridToVec(this.gameState.snakePositions[index]);
+      }
     }
   }
 

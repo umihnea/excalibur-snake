@@ -21,11 +21,7 @@ class SnakeHead extends ex.Actor {
             width: GridProperties.TILE_SIZE,
             height: GridProperties.TILE_SIZE,
         });
-
-        // From excaliburjs.com/docs: If two Fixed bodies meet they will not be pushed or moved by each other,
-        // they will not interact except to throw collision events.
         this.body.collisionType = ex.CollisionType.Passive;
-
         this.gameState = props.gameState;
     }
 
@@ -35,7 +31,6 @@ class SnakeHead extends ex.Actor {
             height: this.height,
             color: ex.Color.Yellow,
         });
-
         this.graphics.add(rectangle);
     }
 
@@ -54,21 +49,24 @@ class SnakeHead extends ex.Actor {
         const direction = this.gameState.lastPressedDirection;
         if (direction && DIFFS[direction]) {
             const { row, col } = vecToGrid(this.pos);
-            const nextPos = gridToVec({
+            const nextGrid = {
                 row: this.advanceGridPosition(
                     row, DIFFS[direction].rows, GridProperties.NUMBER_ROWS
                 ),
                 col: this.advanceGridPosition(
                     col, DIFFS[direction].cols, GridProperties.NUMBER_COLUMNS
                 ),
-            });
-
+            };
+            const nextPos = gridToVec(nextGrid);
             this.pos.setTo(nextPos.x, nextPos.y);
+
+            // Push this position to the game state move history as well
+            // in order to be able to move the snake's segments.
+            this.gameState.lastSnakeHeadGrid = nextGrid;
         } else {
             console.warn("No direction.", JSON.stringify({ direction, diff: DIFFS?.[direction] }));
         }
     }
-
 }
 
 export default SnakeHead;
