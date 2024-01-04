@@ -4,5 +4,5 @@ export type GameState = {
     lastPressedDirection: Direction;
     score: number;
     snakePositions: GridPosition[];
-    lastSnakeHeadGrid: null | GridPosition;
+    snakeHeadGrid: null | GridPosition;
 };

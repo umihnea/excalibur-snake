@@ -66,9 +66,8 @@ class SnakeHead extends ex.Actor {
             const nextPos = gridToVec(nextGrid);
             this.pos.setTo(nextPos.x, nextPos.y);
 
-            // Push this position to the game state move history as well
-            // in order to be able to move the snake's segments.
-            this.gameState.lastSnakeHeadGrid = nextGrid;
+            // Update snake head position in the game state.
+            this.gameState.snakeHeadGrid = nextGrid;
         } else {
             console.warn(
                 "No direction.",

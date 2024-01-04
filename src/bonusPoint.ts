@@ -40,8 +40,8 @@ class BonusPoint extends ex.Actor {
     private _pickPosition(): ex.Vector {
         const forbiddenGrids: GridPosition[] = [
             ...this.gameState.snakePositions,
-            ...(this.gameState.lastSnakeHeadGrid
-                ? [this.gameState.lastSnakeHeadGrid]
+            ...(this.gameState.snakeHeadGrid
+                ? [this.gameState.snakeHeadGrid]
                 : []),
         ];
 

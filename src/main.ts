@@ -40,7 +40,7 @@ class Game extends Engine {
             lastPressedDirection: Directions.NONE,
             score: 0,
             snakePositions: [],
-            lastSnakeHeadGrid: null,
+            snakeHeadGrid: null,
         };
     }
 
@@ -81,7 +81,7 @@ class Game extends Engine {
         const loader = new Loader([]);
         this.start(loader);
 
-        this.showDebug(true);
+        this.showDebug(false);
     }
 
     private addSnakeSegment(grid: GridPosition) {
@@ -113,20 +113,28 @@ class Game extends Engine {
                     this.gameState.lastPressedDirection
                 );
                 // TODO: Create the "can't" text animation effect.
+                // const fadingText = new FadingText({
+                //     text: "can't",
+                //     origin: this.gameState.snakeHeadGrid,
+                // });
+                // this.add(fadingText);
             }
         }
 
         if (
             this.segmentPool?.length &&
-            this.gameState.lastSnakeHeadGrid &&
-            this.gameState.lastSnakeHeadGrid !== this.previousSnakeHeadGrid
+            this.gameState.snakeHeadGrid &&
+            this.gameState.snakeHeadGrid !== this.previousSnakeHeadGrid
         ) {
             // Push last head position to queue and pop last.
-            this.gameState.snakePositions.unshift(
-                this.gameState.lastSnakeHeadGrid
-            );
-            this.gameState.snakePositions.pop();
-            this.previousSnakeHeadGrid = this.gameState.lastSnakeHeadGrid;
+            if (this.previousSnakeHeadGrid) {
+                this.gameState.snakePositions.unshift(
+                    this.previousSnakeHeadGrid
+                );
+                this.gameState.snakePositions.pop();
+            }
+
+            this.previousSnakeHeadGrid = this.gameState.snakeHeadGrid;
 
             // Sync the segments to the snakePositions.
             for (
