@@ -50,7 +50,10 @@ class Game extends Engine {
       gameState: this.gameState,
     });
     this.add(snakeHead);
-    // TODO: Add one more square to the snake from the get-go.
+    this.addSnakeSegment({
+      row: 15,
+      col: 14,
+    });
 
     const initialPoint = new BonusPoint({ gameState: this.gameState });
     this.add(initialPoint);
@@ -60,20 +63,8 @@ class Game extends Engine {
         this.gameState.score += 1;
 
         // Add new snake body segment to snake, where the bonus point was.
-        // 1. Copy the point's position.
         const grid = vecToGrid(event.other.pos);
-        // 2. Remove the point.
-        this.remove(event.other);
-        // 3. Add the segment position to state.
-        this.gameState.snakePositions.push(grid);
-        // 4. Add the segment entity to game.
-        const snakeSegment = new SnakeSegment({
-          row: grid.row,
-          col: grid.col,
-          gameState: this.gameState,
-        });
-        this.add(snakeSegment);
-        this.segmentPool.push(snakeSegment);
+        this.addSnakeSegment(grid);
 
         // Add a new bonus point
         const bonusPoint = new BonusPoint({ gameState: this.gameState });
@@ -88,6 +79,18 @@ class Game extends Engine {
     this.start(loader);
 
     this.showDebug(true);
+  }
+
+  private addSnakeSegment(grid: GridPosition) {
+    const snakeSegment = new SnakeSegment({
+      row: grid.row,
+      col: grid.col,
+      gameState: this.gameState,
+    });
+
+    this.add(snakeSegment);
+    this.gameState.snakePositions.push(grid);
+    this.segmentPool.push(snakeSegment);
   }
 
   public onPostUpdate(engine: Engine, _delta: number) {
