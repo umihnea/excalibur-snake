@@ -3,7 +3,6 @@ import { Engine, Loader, Keys, CollisionEndEvent } from "excalibur";
 import SnakeHead from "./snakeHead";
 import SnakeSegment from "./snakeSegment";
 import BonusPoint from "./bonusPoint";
-import { Resources } from "./resources";
 import { GridProperties } from "./constants";
 import { Directions, Direction } from "./directions";
 import { GameState } from "./gameState";
@@ -79,7 +78,7 @@ class Game extends Engine {
             }
         });
 
-        const loader = new Loader([Resources.Sword]);
+        const loader = new Loader([]);
         this.start(loader);
 
         this.showDebug(true);
