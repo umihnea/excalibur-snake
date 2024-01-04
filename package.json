@@ -6,13 +6,23 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier src/**/*.ts --write"
+
   },
   "devDependencies": {
+    "prettier": "^3.1.1",
     "typescript": "^5.2.2",
     "vite": "^5.0.0"
   },
   "dependencies": {
-    "excalibur": "^0.28.2"
+    "excalibur": "^0.28.2",
+    "lodash": "^4.17.21"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "semi": true,
+    "singleQuote": false
   }
 }

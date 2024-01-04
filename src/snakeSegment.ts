@@ -25,6 +25,6 @@ class SnakeSegment extends ex.Actor {
         });
         this.graphics.add(rectangle);
     }
-};
+}
 
 export default SnakeSegment;

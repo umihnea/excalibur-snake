@@ -6,4 +6,4 @@ export const Directions = Object.freeze({
     NONE: "none",
 });
 
-export type Direction = typeof Directions[keyof typeof Directions];
+export type Direction = (typeof Directions)[keyof typeof Directions];

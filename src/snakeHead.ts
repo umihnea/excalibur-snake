@@ -10,7 +10,7 @@ const DIFFS = Object.freeze({
     [Directions.DOWN]: { rows: 0, cols: 1 },
     [Directions.LEFT]: { rows: -1, cols: 0 },
     [Directions.RIGHT]: { rows: 1, cols: 0 },
-}) as Readonly<Record<string, { rows: number; cols: number; }>>;
+}) as Readonly<Record<string, { rows: number; cols: number }>>;
 
 class SnakeHead extends ex.Actor {
     private readonly gameState;
@@ -35,7 +35,9 @@ class SnakeHead extends ex.Actor {
     }
 
     private advanceGridPosition(
-        current: number, delta: number, end: number
+        current: number,
+        delta: number,
+        end: number
     ): number {
         if (current < 0) {
             return end - 1;
@@ -51,10 +53,14 @@ class SnakeHead extends ex.Actor {
             const { row, col } = vecToGrid(this.pos);
             const nextGrid = {
                 row: this.advanceGridPosition(
-                    row, DIFFS[direction].rows, GridProperties.NUMBER_ROWS
+                    row,
+                    DIFFS[direction].rows,
+                    GridProperties.NUMBER_ROWS
                 ),
                 col: this.advanceGridPosition(
-                    col, DIFFS[direction].cols, GridProperties.NUMBER_COLUMNS
+                    col,
+                    DIFFS[direction].cols,
+                    GridProperties.NUMBER_COLUMNS
                 ),
             };
             const nextPos = gridToVec(nextGrid);
@@ -64,7 +70,10 @@ class SnakeHead extends ex.Actor {
             // in order to be able to move the snake's segments.
             this.gameState.lastSnakeHeadGrid = nextGrid;
         } else {
-            console.warn("No direction.", JSON.stringify({ direction, diff: DIFFS?.[direction] }));
+            console.warn(
+                "No direction.",
+                JSON.stringify({ direction, diff: DIFFS?.[direction] })
+            );
         }
     }
 }

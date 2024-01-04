@@ -1,7 +1,7 @@
 import * as ex from "excalibur";
 
 import { GridProperties } from "./constants";
-import { gridToVec, vecToGrid } from "./gridToReal";
+import { gridToVec } from "./gridToReal";
 import { GameState } from "./gameState";
 
 class BonusPoint extends ex.Actor {
@@ -40,7 +40,9 @@ class BonusPoint extends ex.Actor {
     private _pickPosition(): ex.Vector {
         const forbiddenGrids: GridPosition[] = [
             ...this.gameState.snakePositions,
-            ...(this.gameState.lastSnakeHeadGrid ? [this.gameState.lastSnakeHeadGrid] : []),
+            ...(this.gameState.lastSnakeHeadGrid
+                ? [this.gameState.lastSnakeHeadGrid]
+                : []),
         ];
 
         let row = -1;
@@ -49,7 +51,7 @@ class BonusPoint extends ex.Actor {
         while (!done) {
             row = this._randint(0, GridProperties.NUMBER_ROWS - 1);
             col = this._randint(0, GridProperties.NUMBER_COLUMNS - 1);
-            
+
             // Assume the solution is right.
             done = true;
 
@@ -62,7 +64,10 @@ class BonusPoint extends ex.Actor {
         }
 
         if (row === -1 && col === -1) {
-            console.error("Picking logic did not run.", JSON.stringify({ forbiddenGrids, row, col }));
+            console.error(
+                "Picking logic did not run.",
+                JSON.stringify({ forbiddenGrids, row, col })
+            );
         }
 
         return gridToVec({ row, col });
