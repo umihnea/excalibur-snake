@@ -9,6 +9,14 @@ import { Directions, Direction } from "./directions";
 import { GameState } from "./gameState";
 import { gridToVec, vecToGrid } from "./gridToReal";
 
+const X_AXIS_DIRECTIONS = Object.freeze([
+  Directions.LEFT, Directions.RIGHT,
+]) as (readonly Direction[]);
+
+const Y_AXIS_DIRECTIONS = Object.freeze([
+  Directions.UP, Directions.DOWN,
+]) as (readonly Direction[]);
+
 class Game extends Engine {
   private gameState: GameState;
   private segmentPool: SnakeSegment[];
@@ -42,6 +50,7 @@ class Game extends Engine {
       gameState: this.gameState,
     });
     this.add(snakeHead);
+    // TODO: Add one more square to the snake from the get-go.
 
     const initialPoint = new BonusPoint({ gameState: this.gameState });
     this.add(initialPoint);
@@ -82,10 +91,21 @@ class Game extends Engine {
   }
 
   public onPostUpdate(engine: Engine, _delta: number) {
-    // Update to a new direction, if any
     const direction = this.pollDirection(engine);
-    if (direction && direction != this.gameState.lastPressedDirection) {
-      this.gameState.lastPressedDirection = direction;
+    if (
+      direction && direction != this.gameState.lastPressedDirection
+    ) {
+      const allowed = this.isDirectionAllowed(
+        this.gameState.lastPressedDirection,
+        direction,
+      );
+
+      if (allowed) {
+        this.gameState.lastPressedDirection = direction;
+      } else {
+        console.log("can't", direction, this.gameState.lastPressedDirection);
+        // TODO: Create the "can't" text animation effect.
+      }
     }
 
     if (
@@ -103,6 +123,27 @@ class Game extends Engine {
         this.segmentPool[index].pos = gridToVec(this.gameState.snakePositions[index]);
       }
     }
+  }
+
+  private isDirectionAllowed(lastDirection: Direction, currentDirection: Direction): boolean {
+    // Only allow two consecutive directions if they are from
+    // different axes.
+    if (
+      lastDirection === Directions.NONE
+      || currentDirection  === Directions.NONE
+    ) {
+      return true;
+    }
+
+    return (
+      (
+        X_AXIS_DIRECTIONS.indexOf(lastDirection) !== -1
+        && Y_AXIS_DIRECTIONS.indexOf(currentDirection) !== -1
+      ) || (
+        Y_AXIS_DIRECTIONS.indexOf(lastDirection) !== -1
+        && X_AXIS_DIRECTIONS.indexOf(currentDirection) !== -1
+      )
+    );
   }
 
   private pollDirection(engine: Engine): Maybe<Direction> {
