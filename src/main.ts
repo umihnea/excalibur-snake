@@ -1,8 +1,9 @@
-import { Engine, Loader, Keys, CollisionEndEvent } from "excalibur";
+import { Engine, Loader, Keys, CollisionEndEvent, Font } from "excalibur";
 
 import SnakeHead from "./snakeHead";
 import SnakeSegment from "./snakeSegment";
 import BonusPoint from "./bonusPoint";
+import FadingText from "./fadingText";
 import { GridProperties } from "./constants";
 import { Directions, Direction } from "./directions";
 import { GameState } from "./gameState";
@@ -22,6 +23,7 @@ class Game extends Engine {
     private gameState: GameState;
     private segmentPool: SnakeSegment[];
     private previousSnakeHeadGrid: null | GridPosition;
+    private font: Font;
 
     constructor() {
         super({
@@ -33,6 +35,7 @@ class Game extends Engine {
         this.gameState = this.initializeState();
         this.segmentPool = [];
         this.previousSnakeHeadGrid = null;
+        this.font = new Font({ size: 20 });
     }
 
     private initializeState(): GameState {
@@ -61,7 +64,7 @@ class Game extends Engine {
 
         snakeHead.on("collisionend", (event: CollisionEndEvent) => {
             if (event.other instanceof BonusPoint) {
-                this.gameState.score += 1;
+                this.gameState.score += 1; // TODO: Show score UI element.
 
                 // Add new snake body segment to snake, where the bonus point was.
                 const grid = vecToGrid(event.other.pos);
@@ -81,7 +84,7 @@ class Game extends Engine {
         const loader = new Loader([]);
         this.start(loader);
 
-        this.showDebug(false);
+        this.showDebug(true);
     }
 
     private addSnakeSegment(grid: GridPosition) {
@@ -106,18 +109,14 @@ class Game extends Engine {
 
             if (allowed) {
                 this.gameState.lastPressedDirection = direction;
-            } else {
-                console.log(
-                    "can't",
-                    direction,
-                    this.gameState.lastPressedDirection
+            } else if (this.gameState.snakeHeadGrid) {
+                this.add(
+                    new FadingText({
+                        text: "can't",
+                        origin: gridToVec(this.gameState.snakeHeadGrid),
+                        font: this.font,
+                    })
                 );
-                // TODO: Create the "can't" text animation effect.
-                // const fadingText = new FadingText({
-                //     text: "can't",
-                //     origin: this.gameState.snakeHeadGrid,
-                // });
-                // this.add(fadingText);
             }
         }
 
