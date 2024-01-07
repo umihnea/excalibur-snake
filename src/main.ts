@@ -4,6 +4,7 @@ import SnakeHead from "./snakeHead";
 import SnakeSegment from "./snakeSegment";
 import BonusPoint from "./bonusPoint";
 import FadingText from "./fadingText";
+import ScoreScreen from "./scoreScreen";
 import { GridProperties } from "./constants";
 import { Directions, Direction } from "./directions";
 import { GameState } from "./gameState";
@@ -18,6 +19,10 @@ const Y_AXIS_DIRECTIONS = Object.freeze([
     Directions.UP,
     Directions.DOWN,
 ]) as readonly Direction[];
+
+const SCENES = Object.freeze({
+    ScoreScreen: "scoreScreen",
+});
 
 class Game extends Engine {
     private gameState: GameState;
@@ -44,6 +49,7 @@ class Game extends Engine {
             score: 0,
             snakePositions: [],
             snakeHeadGrid: null,
+            gameOver: false,
         };
     }
 
@@ -84,7 +90,7 @@ class Game extends Engine {
         const loader = new Loader([]);
         this.start(loader);
 
-        this.showDebug(true);
+        this.add(SCENES.ScoreScreen, new ScoreScreen());
     }
 
     private addSnakeSegment(grid: GridPosition) {
@@ -146,6 +152,28 @@ class Game extends Engine {
                 );
             }
         }
+
+        // Check end-game conditions.
+        const bitesItself = this.isSnakeSelfIntersecting();
+        if (bitesItself && !this.gameState.gameOver) {
+            this.gameState.gameOver = true;
+            this.goToScene(SCENES.ScoreScreen, {
+                score: this.gameState.score,
+            });
+        }
+    }
+
+    private isSnakeSelfIntersecting() {
+        const head = this.gameState.snakeHeadGrid;
+        const body = this.gameState.snakePositions;
+        for (let index = 0; index < body.length; index++) {
+            const segment = body[index];
+            if (head?.row === segment.row && head?.col === segment.col) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private isDirectionAllowed(

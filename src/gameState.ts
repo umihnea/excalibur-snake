@@ -5,4 +5,5 @@ export type GameState = {
     score: number;
     snakePositions: GridPosition[];
     snakeHeadGrid: null | GridPosition;
+    gameOver: boolean;
 };
