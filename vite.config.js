@@ -1,6 +1,7 @@
 export default {
   build: {
     minify: true,
-    outDir: "public/"
+    outDir: "dist/",
+    publicDir: "public/"
   }
 }

@@ -12,6 +12,8 @@
       "es2015.iterable",
       "es2015"
     ],
+    "noEmit": true,
+    "skipLibCheck": true,
     "strict": true /* Enable all strict type-checking options. */,
     /* Module Resolution Options */
     "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
